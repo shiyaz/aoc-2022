@@ -1,5 +1,5 @@
 local function tree_height (grid, tx, ty)
-  return grid.hs[grid.width*(ty - 1) + tx]
+  return grid[grid.width*(ty - 1) + tx]
 end
 
 local function left_blocker (grid, tx, ty)
@@ -7,11 +7,10 @@ local function left_blocker (grid, tx, ty)
     return
   end
 
-  local th = grid:tree_height(tx, ty)
+  local th = tree_height(grid, tx, ty)
 
   for x = tx - 1, 1, -1 do
-    local h = grid:tree_height(x, ty)
-    if h >= th then
+    if tree_height(grid, x, ty) >= th then
       return {x, ty}
     end
   end
@@ -22,11 +21,10 @@ local function right_blocker (grid, tx, ty)
     return
   end
 
-  local th = grid:tree_height(tx, ty)
+  local th = tree_height(grid, tx, ty)
 
   for x = tx + 1, grid.width do
-    local h = grid:tree_height(x, ty)
-    if h >= th then
+    if tree_height(grid, x, ty) >= th then
       return {x, ty}
     end
   end
@@ -37,11 +35,10 @@ local function top_blocker (grid, tx, ty)
     return
   end
 
-  local th = grid:tree_height(tx, ty)
+  local th = tree_height(grid, tx, ty)
 
   for y = ty - 1, 1, -1 do
-    local h = grid:tree_height(tx, y)
-    if h >= th then
+    if tree_height(grid, tx, y) >= th then
       return {tx, y}
     end
   end
@@ -52,11 +49,10 @@ local function bottom_blocker (grid, tx, ty)
     return
   end
 
-  local th = grid:tree_height(tx, ty)
+  local th = tree_height(grid, tx, ty)
 
   for y = ty + 1, grid.height do
-    local h = grid:tree_height(tx, y)
-    if h >= th then
+    if tree_height(grid, tx, y) >= th then
       return {tx, y}
     end
   end
@@ -71,16 +67,14 @@ local function blocking_trees (grid, x, y)
   }
 end
 
-local function is_blocked (grid, x, y)
-  local blockers = grid:blocking_trees(x, y)
-  for _, b in pairs(blockers) do
-  end
+local function is_fully_blocked (grid, x, y)
+  local blockers = blocking_trees(grid, x, y)
   return blockers.left and blockers.right and blockers.top and blockers.bottom
 end
 
 local function scenic_score (grid, x, y)
   local score = 1
-  local blockers = grid:blocking_trees(x, y)
+  local blockers = blocking_trees(grid, x, y)
   for dir, b in pairs(blockers) do
     if dir == "left" then
       b = b or { 1, y }
@@ -96,14 +90,14 @@ local function scenic_score (grid, x, y)
       score = score * (b[2] - y)
     end 
   end
-  return score, table.concat(blockers.left or {}, ",").."-"..table.concat(blockers.right or {}, ",").."-"..table.concat(blockers.top or {}, ",").."-"..table.concat(blockers.bottom or {}, ",")
+  return score
 end
 
 local function visible_tree_count (grid)
   local visible_count = 0
   for x = 1, grid.width do
     for y = 1, grid.height do
-      if not is_blocked(grid, x, y) then
+      if not is_fully_blocked(grid, x, y) then
         visible_count = visible_count + 1
       end
     end
@@ -113,37 +107,26 @@ end
 
 local function max_tree_scenic_score (grid)
   local max_score = 0
-  local a = ""
   for x = 1, grid.width do
     for y = 1, grid.height do
-      local score, b = scenic_score(grid, x, y)
+      local score = scenic_score(grid, x, y)
       if score > max_score then
         max_score = score
-        a = b
       end
     end
   end
-  return max_score, a
+  return max_score
 end
 
 local function create_tree_grid (input)
-  local xs, ys, hs = {}, {}, {}
-  local w, h = false, #input
+  local grid = { height = #input, width = false, visible_tree_count = visible_tree_count, max_tree_scenic_score = max_tree_scenic_score }
 
   for y, line in ipairs(input) do
-    local x = 1
-    w = w or line:len()
+    grid.width = grid.width or line:len()
     for h in line:gmatch"%d" do
-      ys[#ys+1], xs[#xs+1], hs[#hs+1], x = y, x, tonumber(h), x + 1
+      grid[#grid+1] = tonumber(h)
     end 
   end
-
-  local grid = { width = w, height = h, xs = xs, ys = ys, hs = hs, }
-
-  grid.tree_height = tree_height
-  grid.blocking_trees = blocking_trees
-  grid.visible_tree_count = visible_tree_count
-  grid.max_tree_scenic_score = max_tree_scenic_score
 
   return grid
 end
