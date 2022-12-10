@@ -37,6 +37,7 @@ local function load (text)
     param = param and tonumber(param)
     table.insert(m, { instr, param })
   end
+  
   return m
 end
 
