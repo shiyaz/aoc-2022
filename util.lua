@@ -1,8 +1,7 @@
 return {
   lines_from_file = function(filename)
-    local f = io.open(filename, "r")
     local lines = {}
-    for line in f:lines() do
+    for line in io.lines(filename) do
       lines[#lines + 1] = line
     end
     return lines

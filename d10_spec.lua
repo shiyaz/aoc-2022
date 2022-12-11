@@ -44,7 +44,6 @@ describe("day 10", function ()
       local strengths = 0
 
       for cycle, X in d10.run(m) do
-        print(cycle, X)
         if cycle == 20 then
           strengths = strengths + cycle*X
         end

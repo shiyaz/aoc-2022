@@ -58,7 +58,7 @@ describe("day 7", function ()
         end
       end
 
-      assert.is.equal(0, del[3])
+      assert.is.equal(5883165, del[3])
     end)
   end)
 end)

@@ -59,7 +59,7 @@ local function next_throw_to(monkey, manage_wl)
   manage_wl = manage_wl or manage_wl_default
 
   item.wl = calculate_new_wl(item.wl, monkey.operation)
-  item.wl = manage_wl(item.wl, r, monkey)
+  item.wl = manage_wl(item.wl)
   
   if do_test(item.wl, monkey.test) then
     throw_to = monkey.throw_to[1]
