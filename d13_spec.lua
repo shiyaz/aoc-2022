@@ -1,0 +1,41 @@
+local util = require "util"
+local d13 = require "d13"
+
+describe("day 13", function ()
+  describe("part a", function ()
+    it("test input", function ()
+      local text = util.lines_from_file("d13a_test.txt")
+      local pkt_pairs = d13.read_pkt_pairs(text)
+      assert.is.equal(8, #pkt_pairs)
+      assert.is.same({1, 1, 3, 1, 1}, pkt_pairs[1][1])      
+      assert.is.same({{1}, {2, 3, 4}}, pkt_pairs[2][1])
+      assert.is.same(13, d13.sum_indices_in_order(pkt_pairs))
+    end)
+    it("with actual input", function ()
+      local text = util.lines_from_file("d13_input.txt")
+      local pkt_pairs = d13.read_pkt_pairs(text)
+      assert.is.same(6428, d13.sum_indices_in_order(pkt_pairs))
+    end)
+  end)
+  describe("part b", function ()
+    it("test input", function ()
+      local text = util.lines_from_file("d13a_test.txt")
+      local pkt_pairs = d13.read_pkt_pairs(text)
+      local all = d13.all_pkts(pkt_pairs)
+
+      local a, b = d13.find_dividers(all)
+
+      assert.are.same(10, a)
+      assert.are.same(14, b)
+    end)
+    it("with actual input", function ()
+      local text = util.lines_from_file("d13_input.txt")
+      local pkt_pairs = d13.read_pkt_pairs(text)
+      local all = d13.all_pkts(pkt_pairs)
+
+      local a, b = d13.find_dividers(all)
+
+      assert.are.same(22464, a*b)
+    end)
+  end)
+end)
